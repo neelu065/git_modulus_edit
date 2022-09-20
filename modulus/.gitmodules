@@ -1,0 +1,6 @@
+[submodule "external/pysdf"]
+	path = external/pysdf
+  url = ssh://git@gitlab-master.nvidia.com:12051/mrietmann/pysdf.git
+[submodule "external/tiny-cuda-nn"]
+	path = external/tiny-cuda-nn
+	url = https://github.com/NVlabs/tiny-cuda-nn.git
