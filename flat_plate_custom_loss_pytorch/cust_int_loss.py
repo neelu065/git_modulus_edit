@@ -236,16 +236,7 @@ def init_domain(interior_invar, domain_invar, cfg=ModulusConfig):
 
     # Following loop manages the above and below vector of belts independently. So, it's hardcoded.
     for i in range(2):
-
-        # lines to eliminate inner loop.
-        # xy = torch.hstack([belts[i][:, [0]], belts[i][:, [1]]])
-        # xfy = torch.hstack([xy[:, [0]] + dx, xy[:, [1]]])  # x in front of the original point.
-        # xby = torch.hstack([xy[:, [0]] - dx, xy[:, [1]]])  # x behind the original point.
-        # xyf = torch.hstack([xy[:, [0]], xy[:, [1]] + (-1) ** i * dy])  # y next of the original point.
-        # xyff = torch.hstack([xy[:, [0]], xy[:, [1]] + (-1) ** i * (2 * dy)])  # y next to next of the original point.
-
-        # for j in range(len(belts[i])):
-        # for j in range(5):
+        
         def neigh_weigh_dist(j):
             xy = [belts[i][j][0], belts[i][j][1]]  # This is the original point.
             xfy = [xy[0] + dx, xy[1]]  # x in front of the original point.
@@ -277,12 +268,6 @@ def init_domain(interior_invar, domain_invar, cfg=ModulusConfig):
             # we will have 7 dimensional vector for each of these points, making it a total of 4 times 7 = 28
             # entries per point (x,y).
 
-            # weights.append([Wxfy, Wxby, Wxyf, Wxyff])
-            # # We add the weights of the neighbors to the weights list.
-            # neighbors.append([neigh_xfy, neigh_xby, neigh_xyf, neigh_xyff, xy])
-            # # We add the neighbors to the neighbors list.
-            # distance.append([dist_xfy, dist_xby, dist_xyf, dist_xyff])
-            # # all distances are appended to the distance list.
             weigths = [Wxfy, Wxby, Wxyf, Wxyff]
             # We add the weights of the neighbors to the weights list.
             neighbours = [neigh_xfy, neigh_xby, neigh_xyf, neigh_xyff, xy]
@@ -448,11 +433,7 @@ class PotentialLoss(Loss):
         # belt total contains all wakes and interior points. First the interior points are seperated using
         # the index method.
         index_sort = pull_sort_wrt_x(self.belt_total, index_belt_interior)
-        # belt_interior_points = self.belt_total[index_belt_interior]
-        #
-        #
-        # _, index = torch.sort(belt_interior_points[:, 0])
-
+        
         res_u_belt_sort = residual_u_belt[index_sort].cuda()
         res_v_belt_sort = residual_v_belt[index_sort].cuda()
         res_poiss_2d_belt_sort = residual_poisson_2d_belt[index_sort].cuda()
@@ -460,16 +441,13 @@ class PotentialLoss(Loss):
         # Similar step is carried out for total_interior points within belt and corr lambda values are sorted.
         # index of interior points present inside belt
         index_int_in_belt = get_index(total_interior, self.belt_total)
-        # https://stackoverflow.com/questions/62588779/pytorch-differences-between-two-tensors
-        # index_int_in_belt = total_interior.unsqueeze(1).eq(self.belt_total).all(-1).any(-1)
+        
 
         # lambda weight in belt
         lambda_within_belt = lambda_weigh['Poisson_2D'][index_int_in_belt]
         index = pull_sort_wrt_x(total_interior, index_int_in_belt)
-        # interior_belt = total_interior[index_int_in_belt]
-        # _, index = torch.sort(interior_belt[:, 0])
-
-        # lambda values sorted wrt x-coordinates of total interior/invar.
+        
+        # lambda values sorted wrt x-coordinates of total interior/invar
         lambda_within_belt_sort = lambda_within_belt[index]
 
         # Predicted values outside belt.
